@@ -1,0 +1,8 @@
+vendor/
+tmp/
+docs/
+jwplayer/
+ref/
+.idea/
+*~
+*.zip

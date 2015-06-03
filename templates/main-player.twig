@@ -1,0 +1,34 @@
+<div class="player-container">
+
+    <h1 class="page-header">
+        <span class="channel-name">Listen Live</span>
+        <small class="channel-title"></small>
+    </h1>
+
+    <div id="mainPlayer">Loading the player...</div>
+
+    <ul class="nav nav-pills nav-justified">
+        {% for show in shows %}
+            <li>
+                <a class="channel-btn"
+                        data-name="{{ show.name }}"
+                        data-cover="{{ show.cover }}"
+                        data-live="{{ show.live }}"
+                        data-title="{{ show.title }}"
+                        data-summary="{{ show.summary }}"
+                        data-podcast="{{ show.audioUrl }}"
+                        data-stream="{{ show.stream }}">
+                    {{ show.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <ul class="nav nav-pills nav-justified">
+        <li><a href="#" class="channel-live-btn">Listen Live</a></li>
+        <li><a href="#" class="up-next-link">Up Next</a></li>
+        <li><a href="#" class="popup-player-link">Pop-Up Player</a></li>
+        <li><a href="#" class="mobile-player-link">Mobile Player</a></li>
+    </ul>
+
+</div>

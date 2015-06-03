@@ -1,0 +1,17 @@
+{
+  "name": "bitolaco/omtimes-jwplayer",
+  "require": {
+    "ext-SimpleXML": "^0.1.0",
+    "twig/twig": "~1.0"
+  },
+  "license": "Proprietary",
+  "authors": [
+    {
+      "name": "Brad Berger",
+      "email": "brad@bradb.net"
+    }
+  ],
+  "autoload": {
+    "psr-0": {"": "src/"}
+  }
+}

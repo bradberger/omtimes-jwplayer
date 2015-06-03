@@ -1,0 +1,40 @@
+<div class="player-container" data-single-show="yes">
+
+    {% if shows | length > 0 %}
+        <div class="single-show-meta"
+             data-name="{{ shows[0].name }}"
+             data-cover="{{ shows[0].cover }}"
+             data-live="{{ shows[0].live }}"
+             data-title="{{ shows[0].title }}"
+             data-summary="{{ shows[0].summary }}"
+             data-podcast="{{ shows[0].audioUrl }}"
+             data-stream="{{ shows[0].stream }}"></div>
+    {% endif %}
+
+    <div id="mainPlayer">Loading the player...</div>
+
+    <ul class="nav nav-pills nav-justified">
+
+        {% if shows[0].live %}
+            <li><a href="#" class="channel-live-btn">Listen Live</a></li>
+        {% endif %}
+
+        <li>
+            <a class="channel-btn"
+               data-name="{{ shows[0].name }}"
+               data-cover="{{ shows[0].cover }}"
+               data-live="{{ shows[0].live }}"
+               data-title="{{ shows[0].title }}"
+               data-summary="{{ shows[0].summary }}"
+               data-podcast="{{ shows[0].audioUrl }}"
+               data-stream="{{ shows[0].stream }}"
+               data-autoplay="yes">
+                Last podcast
+            </a>
+        </li>
+
+        <li><a href="#" class="show-promo-link" data-video="{{ shows[0].promoVideo }}" data-title="{{ shows[0].name }} Promo" data-image="{{ shows[0].cover }}">Promo</a></li>
+        <li><a href="{{ shows[0].featuredCause }}" target="_blank">Featured Cause</a></li>
+    </ul>
+
+</div>
