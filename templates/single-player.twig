@@ -33,8 +33,14 @@
             </a>
         </li>
 
-        <li><a href="#" class="show-promo-link" data-video="{{ shows[0].promoVideo }}" data-title="{{ shows[0].name }} Promo" data-image="{{ shows[0].cover }}">Promo</a></li>
-        <li><a href="{{ shows[0].featuredCause }}" target="_blank">Featured Cause</a></li>
+        {% if shows[0].promoVideo %}
+            <li><a href="#" class="show-promo-link" data-video="{{ shows[0].promoVideo }}" data-title="{{ shows[0].name }} Promo" data-image="{{ shows[0].cover }}">Promo</a></li>
+        {% endif %}
+
+        {% if shows[0].promoVideo %}
+            <li><a href="{{ shows[0].featuredCause }}" target="_blank">Featured Cause</a></li>
+        {% endif %}
+
     </ul>
 
 </div>

@@ -53,8 +53,7 @@ class Show
      * @return integer An id for a post of this show, used to pull post meta from the DB.
      */
     public function getPostId() {
-        // @todo Maybe? Get post id where the title = $this->title
-        $post = get_page_by_title($this->name, 'OBJECT', 'POST');
+        $post = get_page_by_title($this->name, 'OBJECT', 'shows');
         return $post ? $post->ID : null;
     }
 
@@ -161,6 +160,7 @@ class Show
 
     public function getCover() {
 
+        $img = null;
         switch($this->name) {
             case 'Joy of Business':
                 $img = 'http://radio.omtimes.com/wp-content/uploads/2014/12/Simone-Milasas-SP.png';
@@ -196,7 +196,11 @@ class Show
                 $img = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Sylvia-Henderson.png';
                 break;
             default:
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2015/01/iom-fm.png';
+                $id = $this->getPostId();
+                if ($id) {
+                    $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($id), 'full', true);
+                    $img = $image_url[0];
+                }
                 break;
         }
 
@@ -205,6 +209,8 @@ class Show
     }
 
     public function getFeaturedCause() {
+
+        $cause = null;
 
         switch($this->name) {
             case 'Joy of Business':
@@ -251,42 +257,59 @@ class Show
 
     public function getPromoVideo() {
 
+        $video = null;
+
         switch($this->name) {
-            case 'Joy of Business':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2014/12/Simone-Milasas-SP.png';
+            case 'Immersion into Source':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/Immersion-Into-Source_OMTimes-Radio.mp4';
                 break;
-            case 'Eros Evolution':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2014/11/Martha-Lee-sp-rev-A.png';
+            case 'Between Heaven and Earth';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/02/Between-Heaven-and-Earth_OMTimes-Radio.mp4';
+                break;
+            case 'The Elliot Jolesch Hour':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/02/Elliot-Jolesch-Hour_OMTimes-Radio.mp4';
+                break;
+            case 'The O Spot':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/05/O-Spot_OMTimes-Radio.mp4';
+                break;
+            case 'The Dr Kevin Show':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/05/Dr-Kevin-Show_OMTimes-Radio.mp4';
+                break;
+            case 'The Irreverent Therapists':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/02/Irreverent-Therapists_OMTimes-Radio.mp4';
+                break;
+            case 'Joy of Business':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Joy-of-Business_OMTimes.mp4';
                 break;
             case 'Circle of Hearts Radio':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Linda-Frisch-SHOW-PAGE-750x400.png';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Circle-of-Hearts-Radio_OMTimes-Radio.mp4';
                 break;
             case 'Radio Nahmaste':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Sarah-Nash-sp.png';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Radio-Nahmaste_OMTimes-Radio.mp4';
                 break;
             case 'Entanglement Radio':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2015/01/angela-levesque-SP-1-750x400.jpg';
-                break;
-            case 'Laying on of Hands Healing':
-                $video = '';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Entanglement-Radio_OMTimes-Radio.mp4';
                 break;
             case 'Sacred Business Success':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Michelle-Barr-750x400.png';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Sacred-Business-Success_OMTimes-Radio.mp4';
                 break;
-            case 'Conscious Parenting':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Timothy-Stuetz-SP.png';
+            case 'Live with Lisa Phoenix':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/03/Live-with-Lisa-Phoenix_OMTimes-Radio.mp4';
+                break;
+            case 'Equilarium FM':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/Equilarium-FM_OMTimes-Radio.mp4';
                 break;
             case 'Co-Creating NOW':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Monika-Goyal-sp.png';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Co-Creating-Now_OMTimes-Radio.mp4';
                 break;
             case 'I AM Wisdom':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2014/11/Katrina-Cavanough-SHOW-page-750x400.png';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/I-AM-Wisdom_OMTimes-Radio.mp4';
                 break;
             case 'Intuitive Transformations':
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Sylvia-Henderson.png';
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Intuitive-Transformations_OMTimes-Radio.mp4';
                 break;
-            default:
-                $video = 'http://radio.omtimes.com/wp-content/uploads/2015/01/iom-fm.png';
+            case 'New Consciousness Review':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/New-Consciousness-Review_OMTimes-Radio.mp4';
                 break;
         }
 

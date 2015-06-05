@@ -46,19 +46,37 @@ function load_jwplayer_stylesheets() {
     wp_enqueue_style('jwplayer-styles');
 }
 
+function jwplayer_get_show_name() {
+
+    $category = get_the_category();
+    if(empty($category[0]) || empty($category[0]->name)) {
+        $show = get_the_title();
+    } else {
+        $show = $category[0]->name;
+    }
+
+    return $show;
+
+}
+
 function jwplayer_shortcode($a) {
 
-    $category = get_the_category(get_the_ID());
     $twig = jwplayer_get_twig_instance();
     $attrs = shortcode_atts(array(
-        'show' => $category[0]->name,
+        'show' => jwplayer_get_show_name(),
     ), $a);
 
     // Get a list of shows.
     $shows = [];
     $list = explode(',', $attrs['show']);
     foreach($list as &$name) {
-        $shows[] = new Show(trim($name));
+        if(! empty($name)) {
+            $shows[] = new Show(trim($name));
+        }
+    }
+
+    if(empty($shows)) {
+        return '<!-- No shows found. JWPlayer not initialized -->';
     }
 
     $template = $twig->loadTemplate(
