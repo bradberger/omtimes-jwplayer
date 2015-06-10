@@ -65,24 +65,62 @@ class Show
     }
 
 
-    public function getScheduleDayNumbers()
+    public function getSchedule()
     {
-        return get_post_meta($this->getPostId(), '_show_schedule_days', true);
+
+        $schedule = [];
+        for($i = 0; $i < 7; $i++) {
+            $schedule[(string) $i] = [];
+        }
+
+        $days = explode(",", get_post_meta($this->getPostId(), '_show_schedule_days', true));
+        $hour = $this->getScheduleHour();
+        foreach($days as $i => $day) {
+
+            // This is because our the genius behind the other
+            // plugin decided Sunday was day 7...
+            $day = (int) $day;
+            if ((int) $day === 7) {
+                $day = 0;
+            } else {
+                $day -= 1;
+            }
+
+            $schedule[(string) $day][(string) $hour] = true;
+        }
+
+        $repeat = get_post_meta($this->getPostId(), 'repeat', true);
+        foreach($repeat as $listing) {
+            $schedule[$listing['day']][self::getHourFromString($listing['time'])] = true;
+        }
+
+        return $schedule;
+
+    }
+
+    public static function getHourFromString($hour) {
+
+        $pm = substr_count($hour, 'pm');
+        $hour = (int) array_shift(explode(':', $hour));
+        if($pm) {
+            if ($hour !== 12) {
+                $hour += 12;
+            }
+        } else {
+            if ($hour === 12) {
+                $hour = 0;
+            }
+        }
+
+        return $hour;
+
     }
 
     public function getScheduleHour() {
 
         // Show runs today. Now compare time. Format used is 3:00pm, etc.
         $hour = strtolower(get_post_meta($this->getPostId(), '_show_schedule_time', true));
-        $pm = substr_count($hour, 'pm');
-        $hour = (int) array_shift(explode(':', $hour));
-        if($pm) {
-            if($hour !== 12) {
-                $hour += 12;
-            }
-        }
-
-        return $hour;
+        return self::getHourFromString($hour);
 
     }
 
@@ -92,13 +130,9 @@ class Show
             $date = new DateTime();
         }
 
-        foreach (explode(',', $this->getScheduleDayNumbers()) as $day) {
-            if ($date->format('w') == $day) {
-                return true;
-            }
-        }
-
-        return false;
+        $day = (string) $date->format('w');
+        $schedule = $this->getSchedule();
+        return ! empty($schedule[$day]);
 
     }
 
@@ -111,29 +145,20 @@ class Show
      */
     public function isLive()
     {
-        return $this->isPlayingOn(new DateTime());
+        return $this->live = $this->isPlayingOn(new DateTime());
     }
 
     public function isPlayingOn(DateTime $time) {
 
-        $playing = false;
+        // Uncomment below to arbitrarily trigger a response.
+        // $time = new DateTime();
+        // $time->setDate(2015, 6, 7);
+        // $time->setTime(14, 0, 0);
 
-        if($this->isPlayingOnDay($time)) {
-
-            $hour = $this->getScheduleHour();
-
-            $showTime = new DateTime(sprintf(
-                '%sT%s:0:00 GMT-5:00',
-                $time->format('Y-m-d'),
-                $hour
-            ));
-
-            // Compare now with the time of the show, and see if they're the same.
-            if($time->format('G') == $showTime->format('G')) {
-                $playing = true;
-            }
-
-        }
+        $schedule = $this->getSchedule();
+        $day = $time->format('w');
+        $hour = (string) $time->format('G');
+        $playing = ! empty($schedule[$day][$hour]);
 
         return $playing;
 
@@ -201,7 +226,6 @@ class Show
             return $this->promoVideo = $this->attrs['promo'];
         }
 
-        $video = null;
         switch($this->name) {
             case 'Immersion into Source':
                 $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/Immersion-Into-Source_OMTimes-Radio.mp4';
@@ -254,13 +278,13 @@ class Show
             case 'New Consciousness Review':
                 $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/New-Consciousness-Review_OMTimes-Radio.mp4';
                 break;
+            default:
+                $video = null;
+                break;
         }
 
         return $this->promoVideo = $video;
 
     }
-
-
-
 
 }

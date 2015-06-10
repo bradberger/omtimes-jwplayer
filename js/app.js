@@ -13,7 +13,9 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
 
         var setupPlayer = function(file, image, title, autoplay) {
 
-            // http://page.cloudradionetwork.com/omtimes/stream.php?port=8610
+            // Just in case, at least broadcast something live.
+            file = file || "http://page.cloudradionetwork.com/omtimes/stream.php?port=8610";
+
             var opts = {
                 file: file,
                 image: image,
@@ -40,26 +42,32 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
 
         var loadChannel = function(name, title, summary, cover, live, stream, podcast, autoplay) {
 
-            setupPlayer(live ? stream : podcast, cover, title, autoplay || false);
-
-            $(".channel-name").html(name);
-            $(".channel-summary").html(summary);
-
-            if(live) {
-                $(".channel-title").html("On air now");
-            } else {
-                $(".channel-title").html(title.split(' - ')[1]);
-            }
+            var url = live ? stream : podcast;
+            console.info("LoadChannel", url);
+            setupPlayer(url, cover, title, autoplay || false);
 
         };
 
-        $(".channel-live-btn").click(function() {
-            $(".channel-name").html("Listen Live");
-            $(".channel-title").html("");
-            setupPlayer("http://page.cloudradionetwork.com/omtimes/stream.php?port=9100", "/uploads/myPoster.jpg");
+        $(".channel-live-btn").click(function(e) {
+
+            e.preventDefault();
+
+            var ele = $(this);
+            var name = ele.data("name");
+            var title = ele.data("title");
+            var cover = ele.data("cover");
+            var podcast = ele.data("podcast");
+            var stream = ele.data("stream");
+            var summary = ele.data("summary");
+
+            loadChannel(name, title, summary, cover, true, stream, podcast, true);
+
+
         });
 
         $(".channel-btn").click(function(e) {
+
+            e.preventDefault();
 
             var ele = $(this);
             var name = ele.data("name");
@@ -71,7 +79,6 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
             var summary = ele.data("summary");
 
             loadChannel(name, title, summary, cover, live, stream, podcast, true);
-            e.preventDefault();
 
         });
 

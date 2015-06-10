@@ -35,7 +35,7 @@ function jwplayer_get_twig_instance() {
 function load_jwplayer_scripts() {
     wp_register_script('jwplayer', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.js', [], '6.7', false);
     wp_register_script('jwplayer-html5', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.html5.js', ['jwplayer'], '6.7', false);
-    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'jwplayer', 'jwplayer-html5'], '0.1', false);
+    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'jwplayer', 'jwplayer-html5'], '0.1.1', false);
     wp_enqueue_script('jwplayer-custom');
 }
 
