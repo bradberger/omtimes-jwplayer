@@ -17,7 +17,8 @@ class Show
     var $podcast;
     var $audioUrl;
     var $cover;
-    var $stream = 'http://page.cloudradionetwork.com/omtimes/stream.php?port=9100';
+    var $channel;
+    var $stream;
     var $featuredCause = '';
     var $promoVideo = '';
     var $attrs;
@@ -26,15 +27,18 @@ class Show
     {
 
         $this->name = $name;
-        $this->feedUrl = $feedUrl ? : 'http://podcast.omtimes.com/feed/';
+        $this->feedUrl = $feedUrl ?: 'http://podcast.omtimes.com/feed/';
         $this->feed = new Feed($this->feedUrl);
         $this->items = $this->feed->FindByCategory($this->name);
-        $this->attrs = $attrs ? : [
+        $this->attrs = $attrs ?: [
             'video' => false,
             'cause' => false,
             'cover' => false,
             'podcast' => false,
+            'channel' => false,
+            'stream' => 'http://page.cloudradionetwork.com/omtimes/stream.php?port=8610',
         ];
+        $this->getStream();
         $this->getCover();
         $this->isLive();
         $this->getLatestPodcast();
@@ -43,14 +47,16 @@ class Show
 
     }
 
-    public function __get($property) {
+    public function __get($property)
+    {
         if (property_exists($this, $property)) {
             return $this->$property;
         }
         return '';
     }
 
-    public function __set($property, $value) {
+    public function __set($property, $value)
+    {
         if (property_exists($this, $property)) {
             $this->$property = $value;
         }
@@ -59,9 +65,33 @@ class Show
     /**
      * @return integer An id for a post of this show, used to pull post meta from the DB.
      */
-    public function getPostId() {
+    public function getPostId()
+    {
         $post = get_page_by_title($this->name, 'OBJECT', 'shows');
         return $post ? $post->ID : null;
+    }
+
+    public function getStream()
+    {
+        return $this->stream = empty($attrs['stream']) ?
+            $attrs['stream'] : 'http://page.cloudradionetwork.com/omtimes/stream.php?port=9100';
+    }
+
+    public function getChannel()
+    {
+
+        if (! empty($attrs['channel'])) {
+            return $this->channel = $attrs['channel'];
+        }
+
+        if (class_exists('Schedule_Post_types')) {
+            return $this->channel = get_the_term_list(
+                $this->getPostId(), Schedule_Post_types::$channels, '', ', ', ''
+            );
+        }
+
+        return '';
+
     }
 
 
@@ -69,28 +99,28 @@ class Show
     {
 
         $schedule = [];
-        for($i = 0; $i < 7; $i++) {
-            $schedule[(string) $i] = [];
+        for ($i = 0; $i < 7; $i++) {
+            $schedule[(string)$i] = [];
         }
 
         $days = explode(",", get_post_meta($this->getPostId(), '_show_schedule_days', true));
         $hour = $this->getScheduleHour();
-        foreach($days as $i => $day) {
+        foreach ($days as $i => $day) {
 
             // This is because our the genius behind the other
             // plugin decided Sunday was day 7...
-            $day = (int) $day;
-            if ((int) $day === 7) {
+            $day = (int)$day;
+            if ((int)$day === 7) {
                 $day = 0;
             } else {
                 $day -= 1;
             }
 
-            $schedule[(string) $day][(string) $hour] = true;
+            $schedule[(string)$day][(string)$hour] = true;
         }
 
         $repeat = get_post_meta($this->getPostId(), 'repeat', true);
-        foreach($repeat as $listing) {
+        foreach ($repeat as $listing) {
             $schedule[$listing['day']][self::getHourFromString($listing['time'])] = true;
         }
 
@@ -98,11 +128,12 @@ class Show
 
     }
 
-    public static function getHourFromString($hour) {
+    public static function getHourFromString($hour)
+    {
 
         $pm = substr_count($hour, 'pm');
-        $hour = (int) array_shift(explode(':', $hour));
-        if($pm) {
+        $hour = (int)array_shift(explode(':', $hour));
+        if ($pm) {
             if ($hour !== 12) {
                 $hour += 12;
             }
@@ -116,7 +147,8 @@ class Show
 
     }
 
-    public function getScheduleHour() {
+    public function getScheduleHour()
+    {
 
         // Show runs today. Now compare time. Format used is 3:00pm, etc.
         $hour = strtolower(get_post_meta($this->getPostId(), '_show_schedule_time', true));
@@ -124,19 +156,21 @@ class Show
 
     }
 
-    public function isPlayingOnDay($date = null) {
+    public function isPlayingOnDay($date = null)
+    {
 
-        if (! $date || is_a($date, 'DateTime')) {
+        if (!$date || is_a($date, 'DateTime')) {
             $date = new DateTime();
         }
 
-        $day = (string) $date->format('w');
+        $day = (string)$date->format('w');
         $schedule = $this->getSchedule();
-        return ! empty($schedule[$day]);
+        return !empty($schedule[$day]);
 
     }
 
-    public function isPlayingToday() {
+    public function isPlayingToday()
+    {
         return $this->isPlayingOnDay(new DateTime());
     }
 
@@ -148,7 +182,8 @@ class Show
         return $this->live = $this->isPlayingOn(new DateTime());
     }
 
-    public function isPlayingOn(DateTime $time) {
+    public function isPlayingOn(DateTime $time)
+    {
 
         // Uncomment below to arbitrarily trigger a response.
         // $time = new DateTime();
@@ -157,8 +192,8 @@ class Show
 
         $schedule = $this->getSchedule();
         $day = $time->format('w');
-        $hour = (string) $time->format('G');
-        $playing = ! empty($schedule[$day][$hour]);
+        $hour = (string)$time->format('G');
+        $playing = !empty($schedule[$day][$hour]);
 
         return $playing;
 
@@ -180,23 +215,24 @@ class Show
     public function getLatestPodcast()
     {
 
-        if (! empty($this->attrs['podcast'])) {
+        if (!empty($this->attrs['podcast'])) {
             return $this->podcast = $this->attrs['podcast'];
         }
 
         $this->podcast = empty($this->items) ? null : $this->items[0];
         if ($this->podcast) {
             $this->audioUrl = $this->podcast->audioUrl;
-            $this->cover = $this->podcast->image ? : $this->cover;
-            $this->title = $this->podcast->title ? : $this->name;
+            $this->cover = $this->podcast->image ?: $this->cover;
+            $this->title = $this->podcast->title ?: $this->name;
         }
 
         return $this->podcast;
     }
 
-    public function getCover() {
+    public function getCover()
+    {
 
-        if(! empty($this->attrs['cover'])) {
+        if (!empty($this->attrs['cover'])) {
             return $this->cover = $this->attrs['cover'];
         }
 
@@ -210,9 +246,10 @@ class Show
 
     }
 
-    public function getFeaturedCause() {
+    public function getFeaturedCause()
+    {
 
-        if(! empty($this->attrs['cause'])) {
+        if (!empty($this->attrs['cause'])) {
             return $this->featuredCause = $this->attrs['cause'];
         }
 
@@ -220,13 +257,14 @@ class Show
 
     }
 
-    public function getPromoVideo() {
+    public function getPromoVideo()
+    {
 
-        if(! empty($this->attrs['promo'])) {
+        if (!empty($this->attrs['promo'])) {
             return $this->promoVideo = $this->attrs['promo'];
         }
 
-        switch($this->name) {
+        switch ($this->name) {
             case 'Immersion into Source':
                 $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/Immersion-Into-Source_OMTimes-Radio.mp4';
                 break;
