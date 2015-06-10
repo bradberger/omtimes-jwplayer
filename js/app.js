@@ -14,20 +14,27 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
         var setupPlayer = function(file, image, title, autoplay) {
 
             // http://page.cloudradionetwork.com/omtimes/stream.php?port=8610
-            jwplayer("mainPlayer").setup({
+            var opts = {
                 file: file,
                 image: image,
                 width: "100%",
                 title: title | "Show",
                 aspectratio: "15:8",
                 autostart: autoplay || false,
-                type: "audio/mpeg",
                 provider: "audio",
                 modes: [
                     { type: "html5" },
                     { type: "flash", src: "//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.flash.swf" }
                 ]
-            });
+            };
+
+            // Streams from a PHP server confuse JWPlayer - it doesn't know the proper
+            // mimetype, so we need to help it out a bit here.
+            if (file.match(/\.php/)) {
+                opts.type = "audio/mpeg";
+            }
+
+            jwplayer("mainPlayer").setup(opts);
 
         };
 
@@ -138,7 +145,6 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
             // Load whatever is playing right now.
             setupPlayer("http://page.cloudradionetwork.com/omtimes/stream.php?port=9100", "/uploads/myPoster.jpg");
         }
-
 
 
     });

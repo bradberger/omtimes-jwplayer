@@ -33,9 +33,9 @@ function jwplayer_get_twig_instance() {
 }
 
 function load_jwplayer_scripts() {
-    wp_register_script('jwplayer', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.js', [], '6.7', true);
-    wp_register_script('jwplayer-html5', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.html5.js', ['jwplayer'], '6.7', true);
-    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'jwplayer', 'jwplayer-html5'], '0.1', true);
+    wp_register_script('jwplayer', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.js', [], '6.7', false);
+    wp_register_script('jwplayer-html5', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.html5.js', ['jwplayer'], '6.7', false);
+    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'jwplayer', 'jwplayer-html5'], '0.1', false);
     wp_enqueue_script('jwplayer-custom');
 }
 
@@ -64,6 +64,8 @@ function jwplayer_shortcode($a) {
     $twig = jwplayer_get_twig_instance();
     $attrs = shortcode_atts(array(
         'show' => jwplayer_get_show_name(),
+        'video' => false,
+        'cause' => false,
     ), $a);
 
     // Get a list of shows.
@@ -71,7 +73,7 @@ function jwplayer_shortcode($a) {
     $list = explode(',', $attrs['show']);
     foreach($list as &$name) {
         if(! empty($name)) {
-            $shows[] = new Show(trim($name));
+            $shows[] = new Show(trim($name), $attrs);
         }
     }
 

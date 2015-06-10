@@ -20,14 +20,21 @@ class Show
     var $stream = 'http://page.cloudradionetwork.com/omtimes/stream.php?port=9100';
     var $featuredCause = '';
     var $promoVideo = '';
+    var $attrs;
 
-    public function __construct($name, $feedUrl = '')
+    public function __construct($name, Array $attrs = null, $feedUrl = '')
     {
 
         $this->name = $name;
         $this->feedUrl = $feedUrl ? : 'http://podcast.omtimes.com/feed/';
         $this->feed = new Feed($this->feedUrl);
         $this->items = $this->feed->FindByCategory($this->name);
+        $this->attrs = $attrs ? : [
+            'video' => false,
+            'cause' => false,
+            'cover' => false,
+            'podcast' => false,
+        ];
         $this->getCover();
         $this->isLive();
         $this->getLatestPodcast();
@@ -147,8 +154,12 @@ class Show
      */
     public function getLatestPodcast()
     {
-        $this->podcast = empty($this->items) ? null : $this->items[0];
 
+        if (! empty($this->attrs['podcast'])) {
+            return $this->podcast = $this->attrs['podcast'];
+        }
+
+        $this->podcast = empty($this->items) ? null : $this->items[0];
         if ($this->podcast) {
             $this->audioUrl = $this->podcast->audioUrl;
             $this->cover = $this->podcast->image ? : $this->cover;
@@ -160,105 +171,37 @@ class Show
 
     public function getCover() {
 
-        $img = null;
-        switch($this->name) {
-            case 'Joy of Business':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2014/12/Simone-Milasas-SP.png';
-                break;
-            case 'Eros Evolution':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2014/11/Martha-Lee-sp-rev-A.png';
-                break;
-            case 'Circle of Hearts Radio':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Linda-Frisch-SHOW-PAGE-750x400.png';
-                break;
-            case 'Radio Nahmaste':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Sarah-Nash-sp.png';
-                break;
-            case 'Entanglement Radio':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2015/01/angela-levesque-SP-1-750x400.jpg';
-                break;
-            case 'Laying on of Hands Healing':
-                $img = '';
-                break;
-            case 'Sacred Business Success':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Michelle-Barr-750x400.png';
-                break;
-            case 'Conscious Parenting':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Timothy-Stuetz-SP.png';
-                break;
-            case 'Co-Creating NOW':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Monika-Goyal-sp.png';
-                break;
-            case 'I AM Wisdom':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2014/11/Katrina-Cavanough-SHOW-page-750x400.png';
-                break;
-            case 'Intuitive Transformations':
-                $img = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Sylvia-Henderson.png';
-                break;
-            default:
-                $id = $this->getPostId();
-                if ($id) {
-                    $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($id), 'full', true);
-                    $img = $image_url[0];
-                }
-                break;
+        if(! empty($this->attrs['cover'])) {
+            return $this->cover = $this->attrs['cover'];
         }
 
-        return $this->cover = $img;
+        $id = $this->getPostId();
+        if ($id) {
+            $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($id), 'full', true);
+            return $this->cover = $image_url[0];
+        }
+
+        return $this->cover = 'http://omtimes.com/iom/wp-content/uploads/2015/01/omtimes-radio-260x70-without-bg.png';
 
     }
 
     public function getFeaturedCause() {
 
-        $cause = null;
-
-        switch($this->name) {
-            case 'Joy of Business':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2014/12/Simone-Milasas-SP.png';
-                break;
-            case 'Eros Evolution':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2014/11/Martha-Lee-sp-rev-A.png';
-                break;
-            case 'Circle of Hearts Radio':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Linda-Frisch-SHOW-PAGE-750x400.png';
-                break;
-            case 'Radio Nahmaste':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Sarah-Nash-sp.png';
-                break;
-            case 'Entanglement Radio':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2015/01/angela-levesque-SP-1-750x400.jpg';
-                break;
-            case 'Laying on of Hands Healing':
-                $cause = '';
-                break;
-            case 'Sacred Business Success':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Michelle-Barr-750x400.png';
-                break;
-            case 'Conscious Parenting':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Timothy-Stuetz-SP.png';
-                break;
-            case 'Co-Creating NOW':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2015/01/Monika-Goyal-sp.png';
-                break;
-            case 'I AM Wisdom':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2014/11/Katrina-Cavanough-SHOW-page-750x400.png';
-                break;
-            case 'Intuitive Transformations':
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2014/12/OT-SHOW-PAGE-Sylvia-Henderson.png';
-                break;
-            default:
-                $cause = 'http://radio.omtimes.com/wp-content/uploads/2015/01/iom-fm.png';
-                break;
+        if(! empty($this->attrs['cause'])) {
+            return $this->featuredCause = $this->attrs['cause'];
         }
 
-        return $this->featuredCause = $cause;
+        return '';
 
     }
 
     public function getPromoVideo() {
 
-        $video = null;
+        if(! empty($this->attrs['promo'])) {
+            return $this->promoVideo = $this->attrs['promo'];
+        }
 
+        $video = null;
         switch($this->name) {
             case 'Immersion into Source':
                 $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/Immersion-Into-Source_OMTimes-Radio.mp4';

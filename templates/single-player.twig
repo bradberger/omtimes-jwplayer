@@ -28,6 +28,8 @@
                data-summary="{{ shows[0].summary }}"
                data-podcast="{{ shows[0].audioUrl }}"
                data-stream="{{ shows[0].stream }}"
+               data-cause="{{ shows[0].featuredCause }}"
+               data-promo="{{ shows[0].promoVideo }}"
                data-autoplay="yes">
                 Last podcast
             </a>
@@ -37,7 +39,7 @@
             <li><a href="#" class="show-promo-link" data-video="{{ shows[0].promoVideo }}" data-title="{{ shows[0].name }} Promo" data-image="{{ shows[0].cover }}">Promo</a></li>
         {% endif %}
 
-        {% if shows[0].promoVideo %}
+        {% if shows[0].featuredCause %}
             <li><a href="{{ shows[0].featuredCause }}" target="_blank">Featured Cause</a></li>
         {% endif %}
 
