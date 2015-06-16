@@ -11,10 +11,9 @@
 [jwplayer show='Name of show']
 ```
 
-### With Multiple Shows:
-
+### Main player
 ```
-[jwplayer show='Name of show #1, Name of show #2, etc.']
+[jwplayer mode='main']
 ```
 
 ## Showschedule Plugin Error
@@ -35,3 +34,11 @@ Need to replace `get_the_content()` with `apply_filters( 'the_content', get_the_
 ```sql
 UPDATE wp_postmeta SET meta_value = '' WHERE meta_key = '_yoast_wpseo_redirect';
 ```
+
+## Know Issues
+
+- There are, per the specs, multiple channel, but these don't seem to be correct.
+The music channel isn't music, but is the same as the regular channel. 
+
+- Shows that are pulled via the showschedule plugin (required for "Next Up") have channels
+but those channels don't seem to correspond to the streaming channels at the time being.
