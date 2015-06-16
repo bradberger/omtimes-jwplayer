@@ -1,34 +1,67 @@
-<div class="player-container">
+<div class="player-container" data-mode="channels" data-channels="{{ channels|json_encode }}">
 
     <h1 class="page-header">
         <span class="channel-name">Listen Live</span>
         <small class="channel-title"></small>
     </h1>
 
-    <div id="mainPlayer">Loading the player...</div>
+    <div id="mainPlayer">
+        <div class="text-center">
+            <i class="fa fa-spin fa-refresh"></i>
+        </div>
+    </div>
 
-    <ul class="nav nav-pills nav-justified">
-        {% for show in shows %}
-            <li>
-                <a class="channel-btn"
-                        data-name="{{ show.name }}"
-                        data-cover="{{ show.cover }}"
-                        data-live="{{ show.live }}"
-                        data-title="{{ show.title }}"
-                        data-summary="{{ show.summary }}"
-                        data-podcast="{{ show.audioUrl }}"
-                        data-stream="{{ show.stream }}">
-                    {{ show.name }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div role="tabpanel">
 
-    <ul class="nav nav-pills nav-justified">
-        <li><a href="#" class="channel-live-btn">Listen Live</a></li>
-        <li><a href="#" class="up-next-link">Up Next</a></li>
-        <li><a href="#" class="popup-player-link">Pop-Up Player</a></li>
-        <li><a href="#" class="mobile-player-link">Mobile Player</a></li>
-    </ul>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            {% for channel in channels %}
+                <li role="presentation">
+                    <a aria-controls="channel-{{ loop.index }}"
+                       role="tab"
+                       data-toggle="tab"
+                       href="#channel-{{ loop.index }}">{{ channel.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            {% for channel in channels %}
+                <div role="tabpanel" class="tab-pane" id="channel-{{ loop.index }}">
+                    <ul class="nav nav-pills nav-justified channel-nav" data-channel-name="{{ channel.name }}">
+                        <li>
+                            <a class="channel-btn"
+                               data-name="{{ channel.stats.songTitle }}"
+                               data-cover="{{ channel.cover }}"
+                               data-live="true"
+                               data-title="{{ channel.name }}"
+                               data-summary="Now playing {{ channel.stats.songTitle }}"
+                               data-podcast=""
+                               data-video="{{ channel.promo }}"
+                               data-stream="{{ channel.url }}"
+                               data-type="{{ channel.type }}"
+                               title="{{ channel.name }} (Now playing: {{ channel.stats.songTitle }})">
+                                Listen Live
+                            </a>
+                        </li>
+                        {% if next %}
+                            <li><a class="up-next-link"
+                                   data-name=""
+                                   data-cover="{{ next.cover }}"
+                                   data-title="{{ next.title }}"
+                                   data-podcast=""
+                                   data-video="{{ next.promoVideo }}"
+                                   data-stream="{{ next.url }}"
+                                   data-type="{{ next.type }}"
+                                   title="{{ next.title }} - {{ next.name }}">Up Next</a></li>
+                        {% endif %}
+                        <li class="hide"><a class="popup-player-link">Pop-Up Player</a></li>
+                        <li><a class="mobile-player-link">Mobile Player</a></li>
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
 </div>

@@ -11,7 +11,22 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
 
     $(function() {
 
-        var setupPlayer = function(file, image, title, autoplay) {
+        // Prevent errors if the ga() function doesn't exist (think AdBlock, etc.)
+        var sendEvent = function(send, event, category, action, label, value) {
+
+            label = label || null;
+            value = value || null;
+
+            if ("undefined" === typeof ga) {
+                var _gaq = _gaq || [];
+                _gaq.push(["_trackEvent", category, action, label, value]);
+            } else {
+                ga(send, event, category, action, label, value);
+            }
+
+        };
+
+        var setupPlayer = function(file, image, title, autoplay, type) {
 
             // Just in case, at least broadcast something live.
             file = file || "http://page.cloudradionetwork.com/omtimes/stream.php?port=8610";
@@ -24,6 +39,7 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
                 aspectratio: "15:8",
                 autostart: autoplay || false,
                 provider: "audio",
+                primary: 'html5',
                 modes: [
                     { type: "html5" },
                     { type: "flash", src: "//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.flash.swf" }
@@ -32,7 +48,9 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
 
             // Streams from a PHP server confuse JWPlayer - it doesn't know the proper
             // mimetype, so we need to help it out a bit here.
-            if (file.match(/\.php/)) {
+            if(type) {
+                opts.type = type;
+            } else if (file.match(/\.php/) || file.match(/:[0-9]+$/)) {
                 opts.type = "audio/mpeg";
             }
 
@@ -40,11 +58,14 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
 
         };
 
-        var loadChannel = function(name, title, summary, cover, live, stream, podcast, autoplay) {
+        var loadChannel = function(name, title, summary, cover, live, stream, podcast, autoplay, type) {
 
             var url = live ? stream : podcast;
-            console.info("LoadChannel", url);
-            setupPlayer(url, cover, title, autoplay || false);
+            setupPlayer(url, cover, title, autoplay || false, type);
+
+            $(".channel-name").html(name);
+            $(".channel-title").html(title);
+            $(".channel-summary").html(summary);
 
         };
 
@@ -62,6 +83,7 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
 
             loadChannel(name, title, summary, cover, true, stream, podcast, true);
 
+            sendEvent("send", "event", name, "play", "live", stream);
 
         });
 
@@ -77,8 +99,14 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
             var podcast = ele.data("podcast");
             var stream = ele.data("stream");
             var summary = ele.data("summary");
+            var type = ele.data("type") || false;
 
-            loadChannel(name, title, summary, cover, live, stream, podcast, true);
+            $(".channel-btn").removeClass("active");
+            ele.addClass("active");
+
+            loadChannel(name, title, summary, cover, live, stream, podcast, true, type);
+
+            sendEvent("send", "event", name, "play", "podcast", podcast);
 
         });
 
@@ -87,9 +115,11 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
             e.preventDefault();
             window.open("http://omtimes.com/mobile");
 
+            sendEvent("send", "event", name, "play", "mobile", "http://omtimes.com/mobile");
+
         });
 
-        $(".show-promo-link").click(function(e) {
+        var playPromo = function(e) {
 
             e.preventDefault();
 
@@ -99,6 +129,26 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
             var title = ele.data('title');
 
             setupPlayer(video, image, title, true);
+
+            sendEvent("send", "event", name, "play", "promo", video);
+
+        };
+
+        $(".show-promo-link").click(playPromo);
+        $(".up-next-link").click(playPromo);
+
+        $(".featured-cause-link").click(function(e) {
+
+            e.preventDefault();
+
+            var ele = $(this);
+            var cause = ele.data('cause');
+            var image = ele.data('image');
+            var title = ele.data('title');
+
+            setupPlayer(cause, image, title, true);
+
+            sendEvent("send", "event", name, "play", "cause", cause);
 
         });
 
@@ -142,17 +192,39 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
                     $(".channel-live-btn").hide();
                 }
 
+                sendEvent("send", "event", name, "load", live ? "live" : "podcast", live ? stream : podcast);
+
             }
         };
 
         // Handle single shows and the main page differently.
-        if ($(".player-container").data("single-show")) {
+        var show = $(".player-container").data("single-show");
+        if (show) {
             loadSingleShow();
         } else {
             // Load whatever is playing right now.
-            setupPlayer("http://page.cloudradionetwork.com/omtimes/stream.php?port=9100", "/uploads/myPoster.jpg");
+            var btns = $(".channel-btn");
+            if (btns.length) {
+
+                var ele = $(btns[0]);
+                var name = ele.data("name");
+                var title = ele.data("title");
+                var cover = ele.data("cover");
+                var podcast = ele.data("podcast");
+                var stream = ele.data("stream");
+                var summary = ele.data("summary");
+                var type = ele.data("type") || false;
+
+                loadChannel(name, title, summary, cover, true, stream, podcast, false, type);
+
+            }
+
         }
 
+        // Reload on the next hour to get fresh schedules.
+        setTimeout(function() {
+            window.location.reload();
+        }, 3600000 - ((new Date) % 3600000));
 
     });
 

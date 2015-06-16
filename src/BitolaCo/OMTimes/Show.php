@@ -4,6 +4,7 @@ namespace BitolaCo\OMTimes;
 
 use DateTime;
 use DateInterval;
+use DateTimeZone;
 
 class Show
 {
@@ -22,6 +23,7 @@ class Show
     var $featuredCause = '';
     var $promoVideo = '';
     var $attrs;
+    var $host;
 
     public function __construct($name, Array $attrs = null, $feedUrl = '')
     {
@@ -38,12 +40,32 @@ class Show
             'channel' => false,
             'stream' => 'http://page.cloudradionetwork.com/omtimes/stream.php?port=8610',
         ];
+        $this->getHost();
         $this->getStream();
         $this->getCover();
         $this->isLive();
         $this->getLatestPodcast();
         $this->getPromoVideo();
         $this->getFeaturedCause();
+
+    }
+
+    public function getHost() {
+
+        if($this->host) {
+            return $this->host;
+        }
+
+        $this->host = [];
+
+        if ($assigned_hosts = get_post_meta($this->getPostId(), '_show_schedule_host', true)) {
+            $hosts = explode(',', $assigned_hosts);
+            foreach ($hosts as $v) {
+                $this->host[] =  get_post_field('post_title', $v);
+            }
+        }
+
+        return $this->host;
 
     }
 
@@ -73,14 +95,14 @@ class Show
 
     public function getStream()
     {
-        return $this->stream = empty($attrs['stream']) ?
-            $attrs['stream'] : 'http://page.cloudradionetwork.com/omtimes/stream.php?port=9100';
+        return $this->stream = $this->attrs['stream'] ?
+            : 'http://page.cloudradionetwork.com/omtimes/stream.php?port=9100';
     }
 
     public function getChannel()
     {
 
-        if (! empty($attrs['channel'])) {
+        if (!empty($attrs['channel'])) {
             return $this->channel = $attrs['channel'];
         }
 
@@ -120,8 +142,10 @@ class Show
         }
 
         $repeat = get_post_meta($this->getPostId(), 'repeat', true);
-        foreach ($repeat as $listing) {
-            $schedule[$listing['day']][self::getHourFromString($listing['time'])] = true;
+        if(! empty($repeat)) {
+            foreach ($repeat as $listing) {
+                $schedule[$listing['day']][self::getHourFromString($listing['time'])] = true;
+            }
         }
 
         return $schedule;
@@ -132,7 +156,8 @@ class Show
     {
 
         $pm = substr_count($hour, 'pm');
-        $hour = (int)array_shift(explode(':', $hour));
+        $hour = explode(':', $hour);
+        $hour = (int) array_shift($hour);
         if ($pm) {
             if ($hour !== 12) {
                 $hour += 12;
@@ -163,7 +188,7 @@ class Show
             $date = new DateTime();
         }
 
-        $day = (string)$date->format('w');
+        $day = (string) $date->format('w');
         $schedule = $this->getSchedule();
         return !empty($schedule[$day]);
 
@@ -185,6 +210,9 @@ class Show
     public function isPlayingOn(DateTime $time)
     {
 
+        // The show schedule is in Eastern time, so note that here.
+        $time->setTimezone(new DateTimeZone('America/New_York'));
+
         // Uncomment below to arbitrarily trigger a response.
         // $time = new DateTime();
         // $time->setDate(2015, 6, 7);
@@ -202,8 +230,7 @@ class Show
     public function isNext()
     {
 
-        $nextHour = new DateTime();
-        $nextHour->add(new DateInterval('P1H'));
+        $nextHour = new DateTime("+1 hours");
 
         return $this->isPlayingOn($nextHour);
 

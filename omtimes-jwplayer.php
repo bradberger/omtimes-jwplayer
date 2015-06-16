@@ -14,6 +14,7 @@ if(! defined('__DIR__')) {
 require_once __DIR__ . '/vendor/autoload.php';
 
 use BitolaCo\OMTimes\Show;
+use BitolaCo\OMTimes\Schedule;
 
 Twig_Autoloader::register();
 
@@ -33,9 +34,10 @@ function jwplayer_get_twig_instance() {
 }
 
 function load_jwplayer_scripts() {
+    wp_register_script('bootstrap', '//cdn.jsdelivr.net/bootstrap/3.3.4/js/bootstrap.min.js', ['jquery'], '3.3.4', false);
     wp_register_script('jwplayer', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.js', [], '6.7', false);
     wp_register_script('jwplayer-html5', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.html5.js', ['jwplayer'], '6.7', false);
-    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'jwplayer', 'jwplayer-html5'], '0.1.1', false);
+    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'bootstrap', 'jwplayer', 'jwplayer-html5'], '0.1.1', false);
     wp_enqueue_script('jwplayer-custom');
 }
 
@@ -66,28 +68,40 @@ function jwplayer_shortcode($a) {
         'show' => jwplayer_get_show_name(),
         'video' => false,
         'cause' => false,
+        'mode' => 'single',
     ), $a);
 
-    // Get a list of shows.
-    $shows = [];
-    $list = explode(',', $attrs['show']);
-    foreach($list as &$name) {
-        if(! empty($name)) {
-            $shows[] = new Show(trim($name), $attrs);
+    if ($attrs['mode'] === 'single') {
+
+        // Get a list of shows.
+        $shows = [];
+        $list = explode(',', $attrs['show']);
+        foreach($list as &$name) {
+            if(! empty($name)) {
+                $shows[] = new Show(trim($name), $attrs);
+            }
         }
+
+        if(empty($shows)) {
+            return '<!-- No shows found. JWPlayer not initialized -->';
+        }
+
+        $template = $twig->loadTemplate('single-player.twig');
+        return $template->render([
+            'shows' => $shows
+        ]);
+
     }
 
-    if(empty($shows)) {
-        return '<!-- No shows found. JWPlayer not initialized -->';
-    }
-
-    $template = $twig->loadTemplate(
-        count($shows) > 1 ? 'main-player.twig' : 'single-player.twig'
-    );
-
+    // Main player
+    $schedule = new Schedule();
+    $template = $twig->loadTemplate('main-player.twig');
     return $template->render([
-        'shows' => $shows
+        'channels' => $schedule->channels,
+        'next' => $schedule->next,
+        'current' => $schedule->current
     ]);
+
 
 }
 
