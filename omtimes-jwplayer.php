@@ -19,7 +19,7 @@ use BitolaCo\OMTimes\Schedule;
 Twig_Autoloader::register();
 
 function jwplayer_get_env() {
-    return php_sapi_name() == "cli" || substr_count($_SERVER['SERVER_NAME'], 'localhost') ? 'dev' : 'dist';
+    return php_sapi_name() == "cli" || substr_count($_SERVER['SERVER_NAME'], 'localhost') || substr_count($_SERVER['SERVER_NAME'], 'bitola') ? 'dev' : 'dist';
 }
 
 function jwplayer_get_twig_instance() {

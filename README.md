@@ -35,6 +35,10 @@ Need to replace `get_the_content()` with `apply_filters( 'the_content', get_the_
 UPDATE wp_postmeta SET meta_value = '' WHERE meta_key = '_yoast_wpseo_redirect';
 ```
 
+## Blank Page
+
+The blank page template `templates/page-blank.php` needs to be installed in the current theme/child theme.
+
 ## Know Issues
 
 - There are, per the specs, multiple channel, but these don't seem to be correct.
