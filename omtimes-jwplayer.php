@@ -34,17 +34,17 @@ function jwplayer_get_twig_instance() {
 }
 
 function load_jwplayer_scripts() {
-    wp_register_script('bootstrap', '//cdn.jsdelivr.net/bootstrap/3.3.4/js/bootstrap.min.js', ['jquery'], '3.3.4', false);
-    wp_register_script('jwplayer', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.js', [], '6.7', false);
-    wp_register_script('jwplayer-html5', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.html5.js', ['jwplayer'], '6.7', false);
-    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), ['jquery', 'bootstrap', 'jwplayer', 'jwplayer-html5'], '0.1.1', false);
+    wp_register_script('bootstrap', '//cdn.jsdelivr.net/bootstrap/3.3.4/js/bootstrap.min.js', array('jquery'), '3.3.4', false);
+    wp_register_script('jwplayer', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.js', array(), '6.7', false);
+    wp_register_script('jwplayer-html5', '//cdn.jsdelivr.net/jwplayer/6.7/jwplayer.html5.js', array('jwplayer'), '6.7', false);
+    wp_register_script('jwplayer-custom', plugins_url('/js/app.js', __FILE__), array('jquery', 'bootstrap', 'jwplayer', 'jwplayer-html5'), '0.1.1', false);
     wp_enqueue_script('jwplayer-custom');
 }
 
 function load_jwplayer_stylesheets() {
     wp_register_style('bootstrap', '//cdn.jsdelivr.net/fontawesome/4.3.0/css/font-awesome.min.css');
     wp_register_style('font-awesome', '//cdn.jsdelivr.net/bootstrap/3.3.4/css/bootstrap.min.css');
-    wp_register_style('jwplayer-styles', plugin_dir_url(__FILE__) .  '/css/style.css', ['bootstrap', 'font-awesome'], '0.1');
+    wp_register_style('jwplayer-styles', plugin_dir_url(__FILE__) .  '/css/style.css', array('bootstrap', 'font-awesome'), '0.1');
     wp_enqueue_style('jwplayer-styles');
 }
 
@@ -74,7 +74,7 @@ function jwplayer_shortcode($a) {
     if ($attrs['mode'] === 'single') {
 
         // Get a list of shows.
-        $shows = [];
+        $shows = array();
         $list = explode(',', $attrs['show']);
         foreach($list as &$name) {
             if(! empty($name)) {
@@ -87,20 +87,20 @@ function jwplayer_shortcode($a) {
         }
 
         $template = $twig->loadTemplate('single-player.twig');
-        return $template->render([
+        return $template->render(array(
             'shows' => $shows
-        ]);
+        ));
 
     }
 
     // Main player
     $schedule = new Schedule();
     $template = $twig->loadTemplate('main-player.twig');
-    return $template->render([
+    return $template->render(array(
         'channels' => $schedule->channels,
         'next' => $schedule->next,
         'current' => $schedule->current
-    ]);
+    ));
 
 
 }

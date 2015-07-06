@@ -21,10 +21,10 @@ class Schedule
         $this->feed = new Feed('http://podcast.omtimes.com/feed/');
         $this->list = $this->getAllShows();
         $this->shows = $this->feed->getAllShows();
-        $this->channels = $channels ? : [
-            ['name' => 'Talk Radio 1', 'host' => 'www.ophanim.net', 'port' => '8610', 'type' => 'audio/mpeg'],
-            ['name' => 'Music Channel', 'host' => 'www.ophanim.net', 'port' => '9100', 'type' => 'audio/mpeg']
-        ];
+        $this->channels = $channels ? : array(
+            array('name' => 'Talk Radio 1', 'host' => 'www.ophanim.net', 'port' => '8610', 'type' => 'audio/mpeg'),
+            array('name' => 'Music Channel', 'host' => 'www.ophanim.net', 'port' => '9100', 'type' => 'audio/mpeg')
+        );
 
         foreach ($this->channels as &$channel) {
 
@@ -66,7 +66,7 @@ class Schedule
     public function getAllShows()
     {
 
-        $this->list = [];
+        $this->list = array();
         $shows = get_posts(['post_type' => 'shows', 'posts_per_page' => 1000]);
         foreach($shows as $show) {
             $this->list[] = new Show($show->post_title);

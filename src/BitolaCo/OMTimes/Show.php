@@ -32,14 +32,14 @@ class Show
         $this->feedUrl = $feedUrl ?: 'http://podcast.omtimes.com/feed/';
         $this->feed = new Feed($this->feedUrl);
         $this->items = $this->feed->FindByCategory($this->name);
-        $this->attrs = $attrs ?: [
+        $this->attrs = $attrs ?: array(
             'video' => false,
             'cause' => false,
             'cover' => false,
             'podcast' => false,
             'channel' => false,
             'stream' => 'http://page.cloudradionetwork.com/omtimes/stream.php?port=8610',
-        ];
+        );
         $this->getHost();
         $this->getStream();
         $this->getCover();
@@ -56,7 +56,7 @@ class Show
             return $this->host;
         }
 
-        $this->host = [];
+        $this->host = array();
 
         if ($assigned_hosts = get_post_meta($this->getPostId(), '_show_schedule_host', true)) {
             $hosts = explode(',', $assigned_hosts);
@@ -120,9 +120,9 @@ class Show
     public function getSchedule()
     {
 
-        $schedule = [];
+        $schedule = array();
         for ($i = 0; $i < 7; $i++) {
-            $schedule[(string)$i] = [];
+            $schedule[(string)$i] = array();
         }
 
         $days = explode(",", get_post_meta($this->getPostId(), '_show_schedule_days', true));

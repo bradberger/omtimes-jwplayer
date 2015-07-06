@@ -83,11 +83,11 @@ class Feed
     public function FindByCategory($category) {
 
         if(empty($this->items)) {
-            return [];
+            return array();
         }
 
         $category = strtolower($category);
-        $matches = [];
+        $matches = array();
         foreach ($this->items as $item) {
             if(strtolower($item->category) === $category) {
                 $matches[] = $item;
@@ -105,7 +105,7 @@ class Feed
     public function getAllShows()
     {
 
-        $keys = [];
+        $keys = array();
         foreach ($this->items as $item) {
             $keys[$item->category] = true;
         }
