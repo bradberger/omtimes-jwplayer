@@ -46,3 +46,9 @@ The music channel isn't music, but is the same as the regular channel.
 
 - Shows that are pulled via the showschedule plugin (required for "Next Up") have channels
 but those channels don't seem to correspond to the streaming channels at the time being.
+
+## Updated Files
+
+- `wp-content/plugins/showschedule/admin/admin-functions.php`
+- `wp-content/plugins/showschedule/admin/admin-functions.php`
+- `wp-content/plugins/showschedule/templates/single-shows.php`

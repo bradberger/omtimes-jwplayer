@@ -32,6 +32,7 @@
             </li>
         {% endif %}
 
+        {% if shows[0].audioUrl %}
         <li>
             <a class="channel-btn"
                data-name="{{ shows[0].name }}"
@@ -47,6 +48,7 @@
                 Last podcast
             </a>
         </li>
+        {% endif %}
 
         {% if shows[0].promoVideo %}
             <li><a class="show-promo-link"

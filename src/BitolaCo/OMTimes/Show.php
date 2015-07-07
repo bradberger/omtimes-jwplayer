@@ -40,6 +40,7 @@ class Show
             'channel' => false,
             'stream' => 'http://page.cloudradionetwork.com/omtimes/stream.php?port=8610',
         );
+
         $this->getHost();
         $this->getStream();
         $this->getCover();
@@ -247,10 +248,20 @@ class Show
         }
 
         $this->podcast = empty($this->items) ? null : $this->items[0];
-        if ($this->podcast) {
-            $this->audioUrl = $this->podcast->audioUrl;
-            $this->cover = $this->podcast->image ?: $this->cover;
-            $this->title = $this->podcast->title ?: $this->name;
+        foreach($this->items as $item) {
+            if($item->audioUrl && ! $this->audioUrl) {
+                $this->audioUrl = $item->audioUrl;
+            }
+            if($item->cover && ! $this->cover) {
+                $this->cover = $item->image;
+            }
+            if($item->title && ! $this->title) {
+                $this->title = $item->title;
+            }
+        }
+
+        if(empty($this->title)) {
+            $this->title = $this->name;
         }
 
         return $this->podcast;
