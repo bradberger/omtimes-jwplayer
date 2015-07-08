@@ -67,7 +67,7 @@ class Schedule
     {
 
         $this->list = array();
-        $shows = get_posts(['post_type' => 'shows', 'posts_per_page' => 1000]);
+        $shows = get_posts(array('post_type' => 'shows', 'posts_per_page' => 1000));
         foreach($shows as $show) {
             $this->list[] = new Show($show->post_title);
         }
