@@ -27,7 +27,7 @@ function jwplayer_get_twig_instance() {
     return new Twig_Environment(
         new Twig_Loader_Filesystem(__DIR__ . '/templates'),
         array(
-            'cache' => jwplayer_get_env() === 'dist' ? __DIR__ . '/tmp/cache' : false,
+            'cache' => jwplayer_get_env() === 'dist' && false ? __DIR__ . '/tmp/cache' : false,
         )
     );
 

@@ -18,8 +18,11 @@ class FeedItem
 
     public function __construct($link = '', $title = '', $summary = '', $pubDate = null, $category = '', $image = '', $audioUrl = '', $audioType = '', $duration = null) {
 
+        $title = explode('-', $title);
+
         $this->link = $link;
-        $this->title = $title;
+        $this->show = trim(array_shift($title));
+        $this->title = empty($title[1]) ? $this->show : trim($title[1]);
         $this->summary = $summary;
         $this->pubDate = $pubDate ? strtotime($pubDate) : null;
         $this->category = $category;

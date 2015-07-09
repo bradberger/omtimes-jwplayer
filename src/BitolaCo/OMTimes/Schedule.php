@@ -32,29 +32,36 @@ class Schedule
             $channel['shoutcast'] = new Shoutcast($channel['host'], $channel['port']);
             $channel['stats'] = $channel['shoutcast']->getSevenHTML();
 
-            if(! empty($channel['stats'])) {
-                list($channel['stats']->songTitle, ) = explode(' - ', $channel['stats']->songTitle);
+            // Error getting the ShoutCast info, so we need to just use the showschedule plugin instead.
+            $show = null;
+            foreach($this->list as &$s) {
 
-                // Find the show either by title or by host.
-                $show = null;
-                foreach($this->list as $s) {
+                // First check if have the ShoutCAST info.
+                if(! empty($channel['stats'])) {
                     if ($s->name === $channel['stats']->songTitle
                         || in_array($channel['stats']->songTitle, $s->host)) {
                         $show = $s;
                         $channel['stats']->songTitle = $s->name;
-                        break;
                     }
                 }
 
-                $channel['promo'] = $this->defaultPromo;
-                $channel['cover'] = $this->defaultCover;
-
-                if ($show) {
-                    $channel['promo'] = $show->promoVideo;
-                    $channel['cover'] = $show->cover;
+                // If ShoutCAST didn't find anything, use the
+                // showschedule plugin as backup.
+                if(! $show) {
+                    if($s->isLive()) {
+                        $show = $s;
+                    }
                 }
 
             }
+
+            // Set the promo videos and cover, falling back to defaults.
+            $channel['promo'] = $show && $show->promoVideo ?
+                $show->promoVideo : $this->defaultPromo;
+
+            $channel['cover'] = $show && $show->cover ?
+                $show->cover : $this->defaultCover;
+
 
         }
 
@@ -158,7 +165,8 @@ class Schedule
 
         $this->current = null;
         foreach($this->list as &$show) {
-            if($show->isLive()) {
+            $live = $show->isLive();
+            if($live) {
                 $this->current = $show;
             }
         }

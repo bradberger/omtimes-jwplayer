@@ -17,6 +17,7 @@ class Show
     var $live = 0;
     var $podcast;
     var $audioUrl;
+    var $podcastTimestamp;
     var $cover;
     var $channel;
     var $stream;
@@ -28,7 +29,7 @@ class Show
     public function __construct($name, Array $attrs = null, $feedUrl = '')
     {
 
-        $this->name = $name;
+        $this->name = trim(array_shift(explode('-', $name)));
         $this->feedUrl = $feedUrl ?: 'http://podcast.omtimes.com/feed/';
         $this->feed = new Feed($this->feedUrl);
         $this->items = $this->feed->FindByCategory($this->name);
@@ -247,16 +248,25 @@ class Show
             return $this->podcast = $this->attrs['podcast'];
         }
 
+        $newest = 0;
         $this->podcast = empty($this->items) ? null : $this->items[0];
         foreach($this->items as $item) {
-            if($item->audioUrl && ! $this->audioUrl) {
-                $this->audioUrl = $item->audioUrl;
-            }
-            if($item->cover && ! $this->cover) {
-                $this->cover = $item->image;
-            }
-            if($item->title && ! $this->title) {
-                $this->title = $item->title;
+
+            // This tracks the most recent episode, as the
+            // order of the episodes can be changed.
+            $ts = strtotime($this->pubDate);
+            if ($ts >= $newest) {
+                $newest = $ts;
+                if($item->audioUrl) {
+                    $this->podcastTimestamp = $ts;
+                    $this->audioUrl = $item->audioUrl;
+                }
+                if($item->cover) {
+                    $this->cover = $item->image;
+                }
+                if($item->title) {
+                    $this->title = $item->title;
+                }
             }
         }
 
@@ -277,7 +287,9 @@ class Show
         $id = $this->getPostId();
         if ($id) {
             $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($id), 'full', true);
-            return $this->cover = $image_url[0];
+            if(basename($image_url[0]) !== 'default.png') {
+                return $this->cover = $image_url[0];
+            }
         }
 
         return $this->cover = 'http://omtimes.com/iom/wp-content/uploads/2015/01/omtimes-radio-260x70-without-bg.png';
