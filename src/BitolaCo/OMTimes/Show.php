@@ -292,7 +292,7 @@ class Show
             }
         }
 
-        return $this->cover = 'http://omtimes.com/iom/wp-content/uploads/2015/01/omtimes-radio-260x70-without-bg.png';
+        return $this->cover = 'http://omtimes.com/iom/wp-content/uploads/2015/01/omtimes-music-750x400.jpg';
 
     }
 
@@ -366,8 +366,14 @@ class Show
             case 'New Consciousness Review':
                 $video = 'http://omtimes.com/iom/wp-content/uploads/2015/04/New-Consciousness-Review_OMTimes-Radio.mp4';
                 break;
+            case 'Eros Evolution':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Eros-Evolution_OMTimes-Radio.mp4';
+                break;
+            case 'The Positive Communication Show':
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/07/The-Positive-Communication-Show_OMTimes-Radio.mp4';
+                break;
             default:
-                $video = null;
+                $video = 'http://omtimes.com/iom/wp-content/uploads/2015/01/Albino-Recue.mp4';
                 break;
         }
 

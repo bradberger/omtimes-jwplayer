@@ -162,7 +162,7 @@ jwplayer.key="14dXUGTMq4IQsfCFzyBSYPHprN3UtuIse9mDvEprD4c=";
             var top = (screen.height/2)-(h/2);
 
             window.open(
-                '/player/',
+                '/iom/player/',
                 'jwplayer-standalone',
                 [
                     'resizable=no', 'scrollbars=no', 'width=' + w, 'height=' + h,
