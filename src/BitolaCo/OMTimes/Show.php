@@ -29,7 +29,7 @@ class Show
     public function __construct($name, Array $attrs = null, $feedUrl = '')
     {
 
-        $this->name = trim(array_shift(explode('-', $name)));
+        $this->name = trim(array_shift(explode(' - ', $name)));
         $this->feedUrl = $feedUrl ?: 'http://podcast.omtimes.com/feed/';
         $this->feed = new Feed($this->feedUrl);
         $this->items = $this->feed->FindByCategory($this->name);

@@ -44,7 +44,7 @@ function load_jwplayer_scripts() {
 function load_jwplayer_stylesheets() {
     wp_register_style('bootstrap', '//cdn.jsdelivr.net/fontawesome/4.3.0/css/font-awesome.min.css');
     wp_register_style('font-awesome', '//cdn.jsdelivr.net/bootstrap/3.3.4/css/bootstrap.min.css');
-    wp_register_style('jwplayer-styles', plugin_dir_url(__FILE__) .  '/css/style.css', array('bootstrap', 'font-awesome'), '0.1');
+    wp_register_style('jwplayer-styles', plugin_dir_url(__FILE__) .  '/css/style.css', array('bootstrap', 'font-awesome'), '0.1.1');
     wp_enqueue_style('jwplayer-styles');
 }
 

@@ -12,3 +12,7 @@ a:hover {
     margin-top: 32px;
     margin-bottom: 32px;
 }
+
+.nav>li {
+    position: initial !important;
+}
